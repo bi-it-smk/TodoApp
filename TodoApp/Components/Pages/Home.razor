@@ -1,0 +1,88 @@
+﻿@page "/"
+
+@using smk_practical_project.Data
+@using smk_practical_project.Models
+@inject TodoRepo TodoRepo
+@rendermode InteractiveServer
+@layout MainLayout
+
+<PageTitle>Todo</PageTitle>
+
+<div class="head">
+    <p>TO-DOS</p>
+    <h1>Tasks</h1>
+    <p><b>@todos.Count(todo => !todo.IsCompleted)</b> remaining <b>@todos.Count(todo => todo.IsCompleted)</b> done</p>
+</div>
+
+<div class="list>">
+    <input @bind="newTodoTitle" />
+    <button @onclick="AddTodo">Add todo</button>
+</div>
+
+<button @onclick="ClearCompleted">Clear done</button>
+
+<div class="list">
+    <ul>
+        @foreach (var todo in todos)
+        {
+            <li>
+                @if (todo.IsCompleted)
+                {
+                    <s>@todo.Title</s>
+                }
+                else
+                {
+                    @todo.Title
+                }
+                <input type="checkbox" checked="@todo.IsCompleted" @onchange="() => ToggleTodo(todo)" />
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private List<TodoItem> todos = [];
+    private string newTodoTitle = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTodos();
+    }
+
+    private async Task LoadTodos()
+    {
+        todos = (await TodoRepo.GetAllAsync()).ToList();
+    }
+
+    private async Task AddTodo()
+    {
+        if (string.IsNullOrWhiteSpace(newTodoTitle))
+            return;
+
+        await TodoRepo.CreateAsync(newTodoTitle);
+    
+        newTodoTitle = string.Empty;
+
+        await LoadTodos();
+    }
+
+    private async Task ToggleTodo(TodoItem todo){
+        todo.IsCompleted = !todo.IsCompleted;
+
+        await TodoRepo.UpdateAsync(todo);
+
+        await LoadTodos();
+    }
+
+    private async Task ClearCompleted(){
+        var completedTodos = todos.Where(todo => todo.IsCompleted);
+
+        foreach (var todo in completedTodos)
+        {
+            await TodoRepo.DeleteAsync(todo.Id);
+        }
+
+        await LoadTodos();
+    }
+
+}
