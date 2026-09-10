@@ -24,13 +24,24 @@
         {
             <li>
                 <input type="checkbox" class="todo-check" checked="@todo.IsCompleted" @onchange="() => ToggleTodo(todo)" />
-                @if (todo.IsCompleted)
+                @if (todoToEdit == todo.Id)
                 {
-                    <s>@todo.Title</s>
+                    <input @bind="editTitle" />
+                    <button @onclick="() =>SaveEdit(todo)">Save</button>
+                    <button @onclick="CancelEdit">Cancel</button>
+
                 }
-                else
-                {
-                    @todo.Title
+                else {
+                    @if (todo.IsCompleted)
+                    {
+                        <s>@todo.Title</s>
+                    }
+                    else
+                    {
+                        @todo.Title
+                    }
+
+                    <button class="todo-edit" @onclick="() => EditTask(todo)">&#9998</button>
                 }
             </li>
         }
@@ -40,6 +51,9 @@
 @code {
     private List<TodoItem> todos = [];
     private string newTodoTitle = string.Empty;
+
+    private int? todoToEdit = null;
+    private string? editTitle = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,6 +94,28 @@
         }
 
         await LoadTodos();
+    }
+
+    // TODO
+    private async Task EditTask(TodoItem todo){
+            todoToEdit = todo.Id;
+            editTitle = todo.Title;
+    }
+    private async Task CancelEdit(){
+        todoToEdit = null;
+        editTitle = string.Empty;
+    }
+    private async Task SaveEdit(TodoItem todo){
+        if (string.IsNullOrWhiteSpace(editTitle))
+            return;
+
+        todo.Title = editTitle; 
+
+        await TodoRepo.UpdateAsync(todo);
+        await LoadTodos();
+
+        todoToEdit = null;
+        editTitle = string.Empty;
     }
 
 }

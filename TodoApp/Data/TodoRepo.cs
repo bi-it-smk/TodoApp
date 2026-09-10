@@ -93,4 +93,18 @@ public class TodoRepo
             sql,
             new {Id = id});
     }
+
+    // TODO: Edit existing tasks function
+        public async Task EditAsync(TodoItem todo)
+    {
+        using var connection = CreateConnection();
+
+        const string sql = """
+        UPDATE Todos
+        SET Title = @Title, IsCompleted = @IsCompleted
+        WHERE Id = @Id;
+        """;
+
+        await connection.ExecuteAsync(sql, todo);
+    }
 }

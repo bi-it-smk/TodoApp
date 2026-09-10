@@ -12,6 +12,7 @@ b  {
 
 div {
     width: fit-content;
+    min-width: 340px;
 }
 
 .list {
@@ -55,11 +56,11 @@ button:hover {
     appearance: none;
 
     padding: 8px 8px !important;
-    border: 0.5px solid rgba(81, 69, 88, 0.568) !important;
+    border: 0.5px solid rgba(115, 99, 124, 0.568) !important;
     border-radius: 10px !important;
     background-color: rgb(16, 2, 26) !important;
     cursor: pointer;
-    margin-right: 50px;
+    margin-right: 30px;
 }
 
 .todo-check:checked {
@@ -70,10 +71,20 @@ button:hover {
     background-color: rgb(232, 226, 255) !important;
 }
 
+.todo-edit {
+    background-color: rgb(16, 2, 26) !important;
+    border: none !important;
+    color: rgb(137, 119, 148) !important;
+    border-radius: 10px !important;
+    position: relative;
+}
+
 ul {
     list-style: none;
 }
 
 li {
-    padding: 5px;
+    padding-bottom: 15px;
+    padding-right: 15px;
+    padding-top: 8px;
 }
