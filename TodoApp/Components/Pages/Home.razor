@@ -4,19 +4,16 @@
 @using smk_practical_project.Models
 @inject TodoRepo TodoRepo
 @rendermode InteractiveServer
-@layout MainLayout
 
 <PageTitle>Todo</PageTitle>
 
-<div class="head">
     <p>TO-DOS</p>
     <h1>Tasks</h1>
     <p><b>@todos.Count(todo => !todo.IsCompleted)</b> remaining <b>@todos.Count(todo => todo.IsCompleted)</b> done</p>
-</div>
 
-<div class="list>">
-    <input @bind="newTodoTitle" />
-    <button @onclick="AddTodo">Add todo</button>
+<div class="list">
+    <input @bind="newTodoTitle" placeholder="Add a new task"/>
+    <button @onclick="AddTodo">+</button>
 </div>
 
 <button @onclick="ClearCompleted">Clear done</button>
@@ -26,6 +23,7 @@
         @foreach (var todo in todos)
         {
             <li>
+                <input type="checkbox" class="todo-check" checked="@todo.IsCompleted" @onchange="() => ToggleTodo(todo)" />
                 @if (todo.IsCompleted)
                 {
                     <s>@todo.Title</s>
@@ -34,7 +32,6 @@
                 {
                     @todo.Title
                 }
-                <input type="checkbox" checked="@todo.IsCompleted" @onchange="() => ToggleTodo(todo)" />
             </li>
         }
     </ul>

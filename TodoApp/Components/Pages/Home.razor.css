@@ -1,0 +1,79 @@
+body {
+    color: white
+}
+
+p {
+    color: rgba(165, 158, 177, 0.87)
+}
+
+b  {
+    color: white
+}
+
+div {
+    width: fit-content;
+}
+
+.list {
+    border-style: solid;
+    border-radius: 15px;
+    border-width: 0.5px;
+    border-color: rgba(81, 69, 88, 0.568);
+}
+
+.list button {
+    background-color: rgb(114, 91, 141);
+    border: none;
+    border-radius: 15px;
+    padding: 5px 15px;
+    color: white;
+    font-size: large;
+}
+
+.list input {
+    background-color: rgb(16, 2, 26);
+    color: rgb(137, 119, 148);
+    padding-right: 100px;
+    padding-left: 10px;
+    border: none;
+    outline: none;
+}
+
+button {
+    background-color: rgb(16, 2, 26);
+    border: none;
+    color: rgb(137, 119, 148);
+    border-radius: 10px;
+}
+
+button:hover {
+    background-color: rgb(232, 226, 255);
+    color: black;
+}
+
+.todo-check {
+    appearance: none;
+
+    padding: 8px 8px !important;
+    border: 0.5px solid rgba(81, 69, 88, 0.568) !important;
+    border-radius: 10px !important;
+    background-color: rgb(16, 2, 26) !important;
+    cursor: pointer;
+    margin-right: 50px;
+}
+
+.todo-check:checked {
+    background-color: rgb(140, 108, 192) !important;
+}
+
+.todo-check:hover {
+    background-color: rgb(232, 226, 255) !important;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    padding: 5px;
+}
