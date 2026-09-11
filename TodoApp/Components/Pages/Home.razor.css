@@ -29,6 +29,7 @@ div {
     padding: 5px 15px;
     color: white;
     font-size: large;
+    cursor: pointer;
 }
 
 .list input {
@@ -45,6 +46,7 @@ button {
     border: none;
     color: rgb(137, 119, 148);
     border-radius: 10px;
+    cursor: pointer;
 }
 
 button:hover {
@@ -54,13 +56,13 @@ button:hover {
 
 .todo-check {
     appearance: none;
-
     padding: 8px 8px !important;
     border: 0.5px solid rgba(115, 99, 124, 0.568) !important;
     border-radius: 10px !important;
     background-color: rgb(16, 2, 26) !important;
     cursor: pointer;
     margin-right: 30px;
+    content: "2611";
 }
 
 .todo-check:checked {
@@ -69,6 +71,13 @@ button:hover {
 
 .todo-check:hover {
     background-color: rgb(232, 226, 255) !important;
+}
+
+.container-check {
+    position: relative;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
 }
 
 .todo-edit {
@@ -87,4 +96,85 @@ li {
     padding-bottom: 15px;
     padding-right: 15px;
     padding-top: 8px;
+}
+
+.todo-act {
+    appearance: none;
+
+    padding: 8px 8px !important;
+    border: 0.5px solid rgba(115, 99, 124, 0.568) !important;
+    border-radius: 10px !important;
+    background-color: rgb(91, 85, 91) !important;
+    cursor: pointer;
+    margin-right: 60px;
+}
+
+.todo-act:checked {
+    background-color: rgb(19, 255, 113) !important;
+}
+
+.todo-act:hover {
+    background-color: rgb(232, 226, 255) !important;
+}
+
+.check {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-90%, -60%);
+
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.pause {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-76.5%, -62%);
+
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.resume {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-72%, -69%);
+
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    pointer-events: none;
+}
+.container-act {
+    position: relative;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+}
+
+.prio {
+    padding: 15px;
+}
+
+.priority input {
+    appearance: none;
+    padding: 5px 5px !important;
+    border: 0.5px solid rgb(197, 192, 201) !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+}
+
+.priority input:hover {
+    background-color: rgb(232, 226, 255) !important;
+}
+
+.priority input:checked {
+    background-color: rgb(114, 80, 153) !important;
 }

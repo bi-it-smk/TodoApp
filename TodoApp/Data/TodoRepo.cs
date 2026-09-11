@@ -28,7 +28,7 @@ public class TodoRepo
         using var connection = CreateConnection();
 
         const string sql = """
-        SELECT Id, Title, IsCompleted
+        SELECT Id, Title, IsCompleted, IsActive, Priority
         FROM Todos
         ORDER BY Id;
         """;
@@ -41,7 +41,7 @@ public class TodoRepo
         using var connection = CreateConnection();
 
         const string sql = """
-        SELECT Id, Title, IsCompleted
+        SELECT Id, Title, IsCompleted, IsActive, Priority
         FROM Todos
         Where Id = @Id;
         """;
@@ -51,20 +51,20 @@ public class TodoRepo
             new {Id = id});
     }
 
-    public async Task<int> CreateAsync(string title)
+    public async Task<int> CreateAsync(string title, int priority)
     {
         using var connection = CreateConnection();
 
         const string sql = """
-        INSERT INTO Todos (Title, IsCompleted)
-        VALUES (@Title, false);
+        INSERT INTO Todos (Title, IsCompleted, IsActive, Priority)
+        VALUES (@Title, false, true, @Priority);
         
         SELECT LAST_INSERT_ID();
         """;
 
         return await connection.ExecuteScalarAsync<int>(
             sql,
-            new {Title = title});
+            new {Title = title, Priority = priority});
     }
 
     public async Task UpdateAsync(TodoItem todo)
@@ -73,7 +73,7 @@ public class TodoRepo
 
         const string sql = """
         UPDATE Todos
-        SET Title = @Title, IsCompleted = @IsCompleted
+        SET Title = @Title, IsCompleted = @IsCompleted, IsActive = @IsActive, Priority = @Priority
         WHERE Id = @Id;
         """;
 
@@ -92,19 +92,5 @@ public class TodoRepo
         await connection.ExecuteAsync(
             sql,
             new {Id = id});
-    }
-
-    // TODO: Edit existing tasks function
-        public async Task EditAsync(TodoItem todo)
-    {
-        using var connection = CreateConnection();
-
-        const string sql = """
-        UPDATE Todos
-        SET Title = @Title, IsCompleted = @IsCompleted
-        WHERE Id = @Id;
-        """;
-
-        await connection.ExecuteAsync(sql, todo);
     }
 }

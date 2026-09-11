@@ -9,11 +9,23 @@
 
     <p>TO-DOS</p>
     <h1>Tasks</h1>
-    <p><b>@todos.Count(todo => !todo.IsCompleted)</b> remaining <b>@todos.Count(todo => todo.IsCompleted)</b> done</p>
+    <p><b>@todos.Count(todo => !todo.IsCompleted)</b> remaining <b>@todos.Count(todo => todo.IsActive)</b> active <b>@todos.Count(todo => todo.IsCompleted)</b> done</p>
 
 <div class="list">
-    <input @bind="newTodoTitle" placeholder="Add a new task"/>
-    <button @onclick="AddTodo">+</button>
+    <ul>
+        <li>
+            <input @bind="newTodoTitle" placeholder="Add a new task"/>
+            <button @onclick="AddTodo">+</button>
+        </li>
+        <li class = "priority">
+            <label for="lowprio" style="color:rgb(140, 221, 176)">&#9679 Low</label>
+            <input type="radio" id="lowprio" name="priority" @onchange="@(() => taskPriority =1)" />
+            <label for="misprio" style="color:rgb(193, 148, 207)"">&#9679 Medium </label>
+            <input type="radio" id="midprio" name="priority" @onchange="@(() => taskPriority =2)" />
+            <label for="highprio" style="color:rgb(207, 112, 112)">&#9679 High</label>
+            <input type="radio" id="highprio" name="priority" @onchange="@(() => taskPriority =3)" />
+        </li>
+    </ul>
 </div>
 
 <button @onclick="ClearCompleted">Clear done</button>
@@ -23,7 +35,19 @@
         @foreach (var todo in todos)
         {
             <li>
-                <input type="checkbox" class="todo-check" checked="@todo.IsCompleted" @onchange="() => ToggleTodo(todo)" />
+                <span class="container-check">
+                    <input type="checkbox" class="todo-check" checked="@todo.IsCompleted" @onchange="() => ToggleComplete(todo)" />
+                        <span class="check">✓</span>
+                </span>
+                <span class="container-act">
+                    <input type="checkbox" class="todo-act" checked="@todo.IsActive" @onchange="() => ToggleActive(todo)" />
+                    @if(todo.IsActive){
+                        <span class="pause">❚❚</span>
+                    }
+                    else{
+                        <span class="resume">▶</span>
+                    }
+                </span>
                 @if (todoToEdit == todo.Id)
                 {
                     <input @bind="editTitle" />
@@ -32,13 +56,30 @@
 
                 }
                 else {
-                    @if (todo.IsCompleted)
+                    @if (todo.IsCompleted && todo.IsActive)
                     {
                         <s>@todo.Title</s>
+                    }
+                    else if(!todo.IsActive && !todo.IsCompleted)
+                    {
+                        <span style="color: rgb(116, 114, 114);">@todo.Title</span>
+                    }
+                    else if(todo.IsCompleted)
+                    {
+                        <s style="color: rgb(116, 114, 114);">@todo.Title</s>
                     }
                     else
                     {
                         @todo.Title
+                    }
+                    @if (todo.Priority == 1){
+                        <span class="prio" style="color:rgb(140, 221, 176)">&#9679</span>
+                    }
+                    else if (todo.Priority == 2){
+                        <span class="prio" style="color:rgb(193, 148, 207)">&#9679</span>
+                    }
+                    else {
+                        <span class="prio" style="color:rgb(207, 112, 112)">&#9679</span>
                     }
 
                     <button class="todo-edit" @onclick="() => EditTask(todo)">&#9998</button>
@@ -51,7 +92,7 @@
 @code {
     private List<TodoItem> todos = [];
     private string newTodoTitle = string.Empty;
-
+    private int taskPriority = 0;
     private int? todoToEdit = null;
     private string? editTitle = string.Empty;
 
@@ -70,15 +111,29 @@
         if (string.IsNullOrWhiteSpace(newTodoTitle))
             return;
 
-        await TodoRepo.CreateAsync(newTodoTitle);
+        await TodoRepo.CreateAsync(newTodoTitle, taskPriority);
     
         newTodoTitle = string.Empty;
+        taskPriority = 0;
 
         await LoadTodos();
     }
 
-    private async Task ToggleTodo(TodoItem todo){
+    private async Task ToggleComplete(TodoItem todo){
         todo.IsCompleted = !todo.IsCompleted;
+        
+        if (todo.IsCompleted){
+            todo.IsActive = false;
+        }
+
+
+        await TodoRepo.UpdateAsync(todo);
+
+        await LoadTodos();
+    }
+
+    private async Task ToggleActive(TodoItem todo){
+        todo.IsActive = !todo.IsActive;
 
         await TodoRepo.UpdateAsync(todo);
 
@@ -96,7 +151,6 @@
         await LoadTodos();
     }
 
-    // TODO
     private async Task EditTask(TodoItem todo){
             todoToEdit = todo.Id;
             editTitle = todo.Title;
@@ -117,5 +171,4 @@
         todoToEdit = null;
         editTitle = string.Empty;
     }
-
 }
