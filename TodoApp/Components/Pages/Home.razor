@@ -21,7 +21,7 @@
             <label for="lowprio" style="color:rgb(140, 221, 176)">&#9679 Low</label>
             <input type="radio" id="lowprio" name="priority" @onchange="@(() => taskPriority =1)" />
             <label for="misprio" style="color:rgb(193, 148, 207)"">&#9679 Medium </label>
-            <input type="radio" id="midprio" name="priority" @onchange="@(() => taskPriority =2)" />
+            <input type="radio" id="midprio" name="priority" checked="checked" @onchange="@(() => taskPriority =2)" />
             <label for="highprio" style="color:rgb(207, 112, 112)">&#9679 High</label>
             <input type="radio" id="highprio" name="priority" @onchange="@(() => taskPriority =3)" />
         </li>
@@ -30,9 +30,20 @@
 
 <button @onclick="ClearCompleted">Clear done</button>
 
+<div class="filterSort">
+    <label for="filter">filter:</label>
+    <select id="filter" @bind="FilterStatus">
+        <option value="All">All</option>
+        <option value="Open">Open</option>
+        <option value="Closed">Closed</option>
+        <option value="Active">Active</option>
+        <option value="Paused">Paused</option>
+    </select>
+</div>
+
 <div class="list">
     <ul>
-        @foreach (var todo in todos)
+        @foreach (var todo in FilteredTodos)
         {
             <li>
                 <span class="container-check">
@@ -96,7 +107,9 @@
     private int? todoToEdit = null;
     private string? editTitle = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    private string? FilterStatus = "All";
+
+    protected override async Task OnInitializedAsync() // Gets called upon start of app
     {
         await LoadTodos();
     }
@@ -105,6 +118,15 @@
     {
         todos = (await TodoRepo.GetAllAsync()).ToList();
     }
+
+    private IEnumerable<TodoItem> FilteredTodos =>
+        FilterStatus switch{
+            "Open" => todos.Where(todo => !todo.IsCompleted),
+            "Closed" => todos.Where(todo => todo.IsCompleted),
+            "Active" => todos.Where(todo => todo.IsActive),
+            "Paused" => todos.Where(todo => !todo.IsActive && !todo.IsCompleted),
+            _ => todos
+        };
 
     private async Task AddTodo()
     {
