@@ -19,11 +19,11 @@
         </li>
         <li class = "priority">
             <label for="lowprio" style="color:rgb(140, 221, 176)">&#9679 Low</label>
-            <input type="radio" id="lowprio" name="priority" @onchange="@(() => taskPriority =1)" />
-            <label for="misprio" style="color:rgb(193, 148, 207)"">&#9679 Medium </label>
-            <input type="radio" id="midprio" name="priority" checked="checked" @onchange="@(() => taskPriority =2)" />
+            <input type="radio" id="lowprio" name="priority" checked="@(taskPriority==1)" @onchange="@(() => taskPriority =1)" />
+            <label for="midprio" style="color:rgb(193, 148, 207)"">&#9679 Medium </label>
+            <input type="radio" id="midprio" name="priority" checked="@(taskPriority==2)" @onchange="@(() => taskPriority =2)" />
             <label for="highprio" style="color:rgb(207, 112, 112)">&#9679 High</label>
-            <input type="radio" id="highprio" name="priority" @onchange="@(() => taskPriority =3)" />
+            <input type="radio" id="highprio" name="priority" checked="@(taskPriority==3)" @onchange="@(() => taskPriority =3)" />
         </li>
     </ul>
 </div>
@@ -33,17 +33,24 @@
 <div class="filterSort">
     <label for="filter">filter:</label>
     <select id="filter" @bind="FilterStatus">
-        <option value="All">All</option>
-        <option value="Open">Open</option>
-        <option value="Closed">Closed</option>
-        <option value="Active">Active</option>
-        <option value="Paused">Paused</option>
+        <option value="All">all</option>
+        <option value="Open">open</option>
+        <option value="Closed">closed</option>
+        <option value="Active">active</option>
+        <option value="Paused">paused</option>
+    </select>
+    <label for="sort">sort by:</label>
+    <select id="sort" @bind ="SortStatus">
+        <option value="old">oldest</option>
+        <option value="new">newest</option>
+        <option value="highlow">priority high-low</option>
+        <option value="lowhigh">priority low-high</option>
     </select>
 </div>
 
 <div class="list">
     <ul>
-        @foreach (var todo in FilteredTodos)
+        @foreach (var todo in SortedTodos)
         {
             <li>
                 <span class="container-check">
@@ -103,11 +110,13 @@
 @code {
     private List<TodoItem> todos = [];
     private string newTodoTitle = string.Empty;
-    private int taskPriority = 0;
+    private int taskPriority = 2;
     private int? todoToEdit = null;
     private string? editTitle = string.Empty;
 
     private string? FilterStatus = "All";
+
+    private string? SortStatus = "new";
 
     protected override async Task OnInitializedAsync() // Gets called upon start of app
     {
@@ -128,6 +137,14 @@
             _ => todos
         };
 
+    private IEnumerable<TodoItem> SortedTodos =>
+        SortStatus switch{
+            "new" => FilteredTodos.OrderByDescending(todo => todo.Id),
+            "highlow" => FilteredTodos.OrderByDescending(todo => todo.Priority),
+            "lowhigh" => FilteredTodos.OrderBy(todo => todo.Priority),
+            _ => FilteredTodos
+        };
+
     private async Task AddTodo()
     {
         if (string.IsNullOrWhiteSpace(newTodoTitle))
@@ -136,7 +153,6 @@
         await TodoRepo.CreateAsync(newTodoTitle, taskPriority);
     
         newTodoTitle = string.Empty;
-        taskPriority = 0;
 
         await LoadTodos();
     }
