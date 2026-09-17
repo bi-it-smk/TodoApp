@@ -27,9 +27,6 @@
         </li>
     </ul>
 </div>
-
-<button @onclick="ClearCompleted">Clear done</button>
-
 <div class="filterSort">
     <label for="filter">filter:</label>
     <select id="filter" @bind="FilterStatus">
@@ -47,7 +44,6 @@
         <option value="lowhigh">priority low-high</option>
     </select>
 </div>
-
 <div class="list">
     <ul>
         @foreach (var todo in SortedTodos)
@@ -69,9 +65,14 @@
                 @if (todoToEdit == todo.Id)
                 {
                     <input @bind="editTitle" />
+                    <select id="filter" @bind="editPriority">
+                        <option value="1">low priority</option>
+                        <option value="2">medium priority</option>
+                        <option value="3">high priority</option>
+                    </select>
                     <button @onclick="() =>SaveEdit(todo)">Save</button>
                     <button @onclick="CancelEdit">Cancel</button>
-
+                    <button @onclick="() =>DeleteTask(todo)">Delete</button>
                 }
                 else {
                     @if (todo.IsCompleted && todo.IsActive)
@@ -106,6 +107,7 @@
         }
     </ul>
 </div>
+<button @onclick="ClearCompleted">Clear done</button>
 
 @code {
     private List<TodoItem> todos = [];
@@ -113,6 +115,8 @@
     private int taskPriority = 2;
     private int? todoToEdit = null;
     private string? editTitle = string.Empty;
+
+    private int editPriority = 0;
 
     private string? FilterStatus = "All";
 
@@ -192,6 +196,7 @@
     private async Task EditTask(TodoItem todo){
             todoToEdit = todo.Id;
             editTitle = todo.Title;
+            editPriority = todo.Priority;
     }
     private async Task CancelEdit(){
         todoToEdit = null;
@@ -202,11 +207,22 @@
             return;
 
         todo.Title = editTitle; 
+        todo.Priority = editPriority;
 
         await TodoRepo.UpdateAsync(todo);
         await LoadTodos();
 
         todoToEdit = null;
         editTitle = string.Empty;
+        editPriority = 0;
+    }
+
+    private async Task DeleteTask(TodoItem todo){
+        await TodoRepo.DeleteAsync(todo.Id);
+        await LoadTodos();
+
+        todoToEdit = null;
+        editTitle = string.Empty;
+        editPriority = 0;
     }
 }

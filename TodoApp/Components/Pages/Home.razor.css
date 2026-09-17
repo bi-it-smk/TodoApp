@@ -178,3 +178,21 @@ li {
 .priority input:checked {
     background-color: rgb(114, 80, 153) !important;
 }
+
+.filterSort select {
+    background-color: rgb(16, 2, 26);
+    border: 1px;
+    color: rgb(137, 119, 148);
+    cursor: pointer;
+}
+
+.filterSort {
+    padding: 15px;
+}
+
+.list select {
+    background-color: rgb(16, 2, 26);
+    border: 1px;
+    color: rgb(137, 119, 148);
+    cursor: pointer;
+}
