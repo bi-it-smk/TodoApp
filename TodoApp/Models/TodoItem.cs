@@ -9,4 +9,6 @@ public class TodoItem
     public bool IsActive { get; set; } = true;
 
     public int Priority {get; set; } 
+
+    public string? Description {get; set; }
 }

@@ -28,7 +28,7 @@ public class TodoRepo
         using var connection = CreateConnection();
 
         const string sql = """
-        SELECT Id, Title, IsCompleted, IsActive, Priority
+        SELECT Id, Title, IsCompleted, IsActive, Priority, Description
         FROM Todos
         ORDER BY Id;
         """;
@@ -41,7 +41,7 @@ public class TodoRepo
         using var connection = CreateConnection();
 
         const string sql = """
-        SELECT Id, Title, IsCompleted, IsActive, Priority
+        SELECT Id, Title, IsCompleted, IsActive, Priority, Description
         FROM Todos
         Where Id = @Id;
         """;
@@ -51,20 +51,20 @@ public class TodoRepo
             new {Id = id});
     }
 
-    public async Task<int> CreateAsync(string title, int priority)
+    public async Task<int> CreateAsync(string title, int priority, string description)
     {
         using var connection = CreateConnection();
 
         const string sql = """
-        INSERT INTO Todos (Title, IsCompleted, IsActive, Priority)
-        VALUES (@Title, false, true, @Priority);
+        INSERT INTO Todos (Title, IsCompleted, IsActive, Priority, Description)
+        VALUES (@Title, false, true, @Priority, @Description);
         
         SELECT LAST_INSERT_ID();
         """;
 
         return await connection.ExecuteScalarAsync<int>(
             sql,
-            new {Title = title, Priority = priority});
+            new {Title = title, Priority = priority, Description = description});
     }
 
     public async Task UpdateAsync(TodoItem todo)
@@ -73,7 +73,7 @@ public class TodoRepo
 
         const string sql = """
         UPDATE Todos
-        SET Title = @Title, IsCompleted = @IsCompleted, IsActive = @IsActive, Priority = @Priority
+        SET Title = @Title, IsCompleted = @IsCompleted, IsActive = @IsActive, Priority = @Priority, Description = @Description
         WHERE Id = @Id;
         """;
 

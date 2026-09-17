@@ -17,6 +17,9 @@
             <input @bind="newTodoTitle" placeholder="Add a new task"/>
             <button @onclick="AddTodo">+</button>
         </li>
+        <li>
+            <input @bind ="newTodoDescription" placeholder="Add description"/>
+        </li>
         <li class = "priority">
             <label for="lowprio" style="color:rgb(140, 221, 176)">&#9679 Low</label>
             <input type="radio" id="lowprio" name="priority" checked="@(taskPriority==1)" @onchange="@(() => taskPriority =1)" />
@@ -100,8 +103,8 @@
                     else {
                         <span class="prio" style="color:rgb(207, 112, 112)">&#9679</span>
                     }
-
                     <button class="todo-edit" @onclick="() => EditTask(todo)">&#9998</button>
+                    <p>@todo.Description</p>
                 }
             </li>
         }
@@ -121,6 +124,8 @@
     private string? FilterStatus = "All";
 
     private string? SortStatus = "new";
+
+    private string newTodoDescription = string.Empty;
 
     protected override async Task OnInitializedAsync() // Gets called upon start of app
     {
@@ -154,9 +159,10 @@
         if (string.IsNullOrWhiteSpace(newTodoTitle))
             return;
 
-        await TodoRepo.CreateAsync(newTodoTitle, taskPriority);
+        await TodoRepo.CreateAsync(newTodoTitle, taskPriority, newTodoDescription);
     
         newTodoTitle = string.Empty;
+        newTodoDescription = string.Empty;
 
         await LoadTodos();
     }

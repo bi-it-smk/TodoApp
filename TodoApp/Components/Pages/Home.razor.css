@@ -39,6 +39,7 @@ div {
     padding-left: 10px;
     border: none;
     outline: none;
+    overflow-wrap: anywhere;
 }
 
 button {
@@ -96,6 +97,7 @@ li {
     padding-bottom: 15px;
     padding-right: 15px;
     padding-top: 8px;
+    overflow-wrap: anywhere;
 }
 
 .todo-act {
