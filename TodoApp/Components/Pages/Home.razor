@@ -20,10 +20,13 @@
         <li>
             <input @bind ="newTodoDescription" placeholder="Add description"/>
         </li>
-        <li class = "priority">
+        <li>
+            <input @bind ="newDueDate" type="date" id="dateInput" />
+        </li>
+        <li class="priority">
             <label for="lowprio" style="color:rgb(140, 221, 176)">&#9679 Low</label>
             <input type="radio" id="lowprio" name="priority" checked="@(taskPriority==1)" @onchange="@(() => taskPriority =1)" />
-            <label for="midprio" style="color:rgb(193, 148, 207)"">&#9679 Medium </label>
+            <label for="midprio" style="color:rgb(193, 148, 207)">&#9679 Medium </label>
             <input type="radio" id="midprio" name="priority" checked="@(taskPriority==2)" @onchange="@(() => taskPriority =2)" />
             <label for="highprio" style="color:rgb(207, 112, 112)">&#9679 High</label>
             <input type="radio" id="highprio" name="priority" checked="@(taskPriority==3)" @onchange="@(() => taskPriority =3)" />
@@ -69,6 +72,7 @@
                 {
                     <input @bind="editTitle" />
                     <input @bind ="editDesc" />
+                    <input @bind="editDate" type="date"/>
                     <select id="filter" @bind="editPriority">
                         <option value="1">low priority</option>
                         <option value="2">medium priority</option>
@@ -106,6 +110,23 @@
                     }
                     <button class="todo-edit" @onclick="() => EditTask(todo)">&#9998</button>
                     <p>@todo.Description</p>
+                    @if (todo.DueDate == DateTime.Today)
+                    {
+                        <p style="color:rgb(255, 212, 163)">due today ⏳</p>
+                    }
+                    else if (todo.DueDate == DateTime.Today.AddDays(1))
+                    {
+                        <p style="color:rgb(201, 236, 201)">due tomorrow ⏳</p>
+                    }
+                    else if (todo.DueDate < DateTime.Today)
+                    {
+                        <p style="color:rgb(255, 116, 116)">overdue ⏳</p>
+                    }
+                    else
+                    {
+                        <p> @todo.DueDate.ToString("dd-MM-yyyy") ⏳ </p>
+
+                    }
                 }
             </li>
         }
@@ -129,6 +150,10 @@
     private string SortStatus = "new";
 
     private string newTodoDescription = string.Empty;
+
+    private DateTime newDueDate = DateTime.Today.AddDays(value: 1);
+
+    private DateTime editDate = DateTime.Today.AddDays(value: 1);
 
     protected override async Task OnInitializedAsync() // Gets called upon start of app
     {
@@ -162,10 +187,11 @@
         if (string.IsNullOrWhiteSpace(newTodoTitle))
             return;
 
-        await TodoRepo.CreateAsync(newTodoTitle, taskPriority, newTodoDescription);
+        await TodoRepo.CreateAsync(newTodoTitle, taskPriority, newTodoDescription, newDueDate);
     
         newTodoTitle = string.Empty;
         newTodoDescription = string.Empty;
+        newDueDate = DateTime.Today.AddDays(1);
 
         await LoadTodos();
     }
@@ -207,10 +233,12 @@
             editTitle = todo.Title;
             editDesc = todo.Description;
             editPriority = todo.Priority;
+            editDate = todo.DueDate;
     }
     private async Task CancelEdit(){
         todoToEdit = null;
         editTitle = string.Empty;
+        editDate = DateTime.Today.AddDays(value: 1);
     }
     private async Task SaveEdit(TodoItem todo){
         if (string.IsNullOrWhiteSpace(editTitle))
@@ -219,6 +247,7 @@
         todo.Title = editTitle; 
         todo.Priority = editPriority;
         todo.Description = editDesc;
+        todo.DueDate = editDate;
 
         await TodoRepo.UpdateAsync(todo);
         await LoadTodos();
@@ -227,6 +256,7 @@
         editTitle = string.Empty;
         editDesc = string.Empty;
         editPriority = 0;
+        editDate = DateTime.Today.AddDays(value: 1);
     }
 
     private async Task DeleteTask(TodoItem todo){

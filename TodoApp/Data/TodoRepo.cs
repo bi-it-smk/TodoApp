@@ -27,7 +27,8 @@ public class TodoRepo
                 IsCompleted BOOLEAN NOT NULL DEFAULT FALSE,
                 IsActive BOOLEAN NOT NULL DEFAULT TRUE,
                 Priority INT NOT NULL,
-                Description VARCHAR(255)
+                Description VARCHAR(255),
+                DueDate Date NOT NULL
             );
             """;
 
@@ -45,7 +46,7 @@ public class TodoRepo
         using var connection = CreateConnection();
 
         const string sql = """
-        SELECT Id, Title, IsCompleted, IsActive, Priority, Description
+        SELECT Id, Title, IsCompleted, IsActive, Priority, Description, DueDate
         FROM Todos
         ORDER BY Id;
         """;
@@ -58,7 +59,7 @@ public class TodoRepo
         using var connection = CreateConnection();
 
         const string sql = """
-        SELECT Id, Title, IsCompleted, IsActive, Priority, Description
+        SELECT Id, Title, IsCompleted, IsActive, Priority, Description, DueDate
         FROM Todos
         Where Id = @Id;
         """;
@@ -68,20 +69,20 @@ public class TodoRepo
             new {Id = id});
     }
 
-    public async Task<int> CreateAsync(string title, int priority, string description)
+    public async Task<int> CreateAsync(string title, int priority, string description, DateTime dueDate)
     {
         using var connection = CreateConnection();
 
         const string sql = """
-        INSERT INTO Todos (Title, IsCompleted, IsActive, Priority, Description)
-        VALUES (@Title, false, true, @Priority, @Description);
+        INSERT INTO Todos (Title, IsCompleted, IsActive, Priority, Description, DueDate)
+        VALUES (@Title, false, true, @Priority, @Description, @DueDate);
         
         SELECT LAST_INSERT_ID();
         """;
 
         return await connection.ExecuteScalarAsync<int>(
             sql,
-            new {Title = title, Priority = priority, Description = description});
+            new {Title = title, Priority = priority, Description = description, DueDate = dueDate});
     }
 
     public async Task UpdateAsync(TodoItem todo)
@@ -90,7 +91,7 @@ public class TodoRepo
 
         const string sql = """
         UPDATE Todos
-        SET Title = @Title, IsCompleted = @IsCompleted, IsActive = @IsActive, Priority = @Priority, Description = @Description
+        SET Title = @Title, IsCompleted = @IsCompleted, IsActive = @IsActive, Priority = @Priority, Description = @Description, DueDate = @DueDate
         WHERE Id = @Id;
         """;
 
