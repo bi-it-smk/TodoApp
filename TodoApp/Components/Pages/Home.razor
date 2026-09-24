@@ -68,6 +68,7 @@
                 @if (todoToEdit == todo.Id)
                 {
                     <input @bind="editTitle" />
+                    <input @bind ="editDesc" />
                     <select id="filter" @bind="editPriority">
                         <option value="1">low priority</option>
                         <option value="2">medium priority</option>
@@ -118,6 +119,8 @@
     private int taskPriority = 2;
     private int? todoToEdit = null;
     private string? editTitle = string.Empty;
+
+    private string? editDesc = string.Empty;
 
     private int editPriority = 0;
 
@@ -202,6 +205,7 @@
     private async Task EditTask(TodoItem todo){
             todoToEdit = todo.Id;
             editTitle = todo.Title;
+            editDesc = todo.Description;
             editPriority = todo.Priority;
     }
     private async Task CancelEdit(){
@@ -214,12 +218,14 @@
 
         todo.Title = editTitle; 
         todo.Priority = editPriority;
+        todo.Description = editDesc;
 
         await TodoRepo.UpdateAsync(todo);
         await LoadTodos();
 
         todoToEdit = null;
         editTitle = string.Empty;
+        editDesc = string.Empty;
         editPriority = 0;
     }
 
