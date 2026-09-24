@@ -14,4 +14,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  mariadb-data:k
+  mariadb-data:

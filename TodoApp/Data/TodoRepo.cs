@@ -17,6 +17,23 @@ public class TodoRepo
             );
     }
 
+    public async Task InitializeDatabaseAsync()
+    {
+        using var connection = CreateConnection();
+        const string sql = """
+            CREATE TABLE IF NOT EXISTS Todos (
+                Id INT AUTO_INCREMENT PRIMARY KEY,
+                Title VARCHAR(255) NOT NULL,
+                IsCompleted BOOLEAN NOT NULL DEFAULT FALSE,
+                IsActive BOOLEAN NOT NULL DEFAULT TRUE,
+                Priority INT NOT NULL,
+                Description VARCHAR(255)
+            );
+            """;
+
+        await connection.ExecuteAsync(sql);
+    }
+
     private MySqlConnection CreateConnection()
     {
         return new MySqlConnection(_connectionString);

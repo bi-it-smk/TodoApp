@@ -11,6 +11,13 @@ builder.Services.AddScoped<TodoRepo>();
 
 var app = builder.Build();
 
+// Initialize the database
+using var scope = app.Services.CreateScope();
+
+var todoReop = scope.ServiceProvider.GetRequiredService<TodoRepo>();
+
+await todoReop.InitializeDatabaseAsync();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
