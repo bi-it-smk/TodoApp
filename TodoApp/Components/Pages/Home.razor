@@ -1,5 +1,6 @@
 ﻿@page "/"
 
+@using Microsoft.VisualBasic
 @using smk_practical_project.Data
 @using smk_practical_project.Models
 @inject TodoRepo TodoRepo
@@ -41,6 +42,9 @@
         <option value="Closed">closed</option>
         <option value="Active">active</option>
         <option value="Paused">paused</option>
+        <option value="DueTomorrow">due tomorrow</option>
+        <option value="DueToday">due today</option>
+        <option value="Overdue">overdue</option>
     </select>
     <label for="sort">sort by:</label>
     <select id="sort" @bind ="SortStatus">
@@ -48,6 +52,7 @@
         <option value="new">newest</option>
         <option value="highlow">priority high-low</option>
         <option value="lowhigh">priority low-high</option>
+        <option value="duesoon">due date</option>
     </select>
 </div>
 <div class="list">
@@ -171,6 +176,9 @@
             "Closed" => todos.Where(todo => todo.IsCompleted),
             "Active" => todos.Where(todo => todo.IsActive),
             "Paused" => todos.Where(todo => !todo.IsActive && !todo.IsCompleted),
+            "DueTomorrow" => todos.Where (todo => todo.DueDate == DateTime.Today.AddDays(value: 1)),
+            "DueToday" => todos.Where (todo => todo.DueDate == DateTime.Today),
+            "Overdue" => todos.Where (todo => todo.DueDate < DateTime.Today),
             _ => todos
         };
 
@@ -179,6 +187,7 @@
             "new" => FilteredTodos.OrderByDescending(todo => todo.Id),
             "highlow" => FilteredTodos.OrderByDescending(todo => todo.Priority),
             "lowhigh" => FilteredTodos.OrderBy(todo => todo.Priority),
+            "duesoon" => FilteredTodos.OrderBy(todo => todo.DueDate),
             _ => FilteredTodos
         };
 
