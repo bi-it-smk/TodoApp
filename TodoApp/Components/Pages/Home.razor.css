@@ -198,3 +198,16 @@ li {
     color: rgb(137, 119, 148);
     cursor: pointer;
 }
+
+.active {
+    color: inherit;
+}
+
+.paused {
+    color: rgb(116, 114, 114);
+}
+
+.completed {
+    color: rgb(116, 114, 114);
+    text-decoration: line-through;
+}

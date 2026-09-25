@@ -1,6 +1,5 @@
 ﻿@page "/"
 
-@using Microsoft.VisualBasic
 @using smk_practical_project.Data
 @using smk_practical_project.Models
 @inject TodoRepo TodoRepo
@@ -15,11 +14,11 @@
 <div class="list">
     <ul>
         <li>
-            <input @bind="newTodoTitle" placeholder="Add a new task"/>
+            <input @bind="newTodoTitle" placeholder="Add a new task" maxlength="255" />
             <button @onclick="AddTodo">+</button>
         </li>
         <li>
-            <input @bind ="newTodoDescription" placeholder="Add description"/>
+            <input @bind ="newTodoDescription" placeholder="Add description" maxlength="255" />
         </li>
         <li>
             <input @bind ="newDueDate" type="date" id="dateInput" />
@@ -88,23 +87,12 @@
                     <button @onclick="() =>DeleteTask(todo)">Delete</button>
                 }
                 else {
-                    @if (todo.IsCompleted && todo.IsActive)
-                    {
-                        <s>@todo.Title</s>
-                    }
-                    else if(!todo.IsActive && !todo.IsCompleted)
-                    {
-                        <span style="color: rgb(116, 114, 114);">@todo.Title</span>
-                    }
-                    else if(todo.IsCompleted)
-                    {
-                        <s style="color: rgb(116, 114, 114);">@todo.Title</s>
-                    }
-                    else
-                    {
+                    <span class="@GetTodoTitleClass(todo)">
                         @todo.Title
-                    }
-                    @if (todo.Priority == 1){
+                    </span>
+
+                @if (todo.Priority == 1)
+                    {
                         <span class="prio" style="color:rgb(140, 221, 176)">&#9679</span>
                     }
                     else if (todo.Priority == 2){
@@ -141,6 +129,7 @@
 
 @code {
     private List<TodoItem> todos = [];
+
     private string newTodoTitle = string.Empty;
     private int taskPriority = 2;
     private int? todoToEdit = null;
@@ -159,6 +148,16 @@
     private DateTime newDueDate = DateTime.Today.AddDays(value: 1);
 
     private DateTime editDate = DateTime.Today.AddDays(value: 1);
+
+    private string GetTodoTitleClass(TodoItem todo)
+    {
+        if (todo.IsCompleted)
+        {
+            return "completed";
+        }
+
+        return todo.IsActive ? "active" : "paused";
+    }
 
     protected override async Task OnInitializedAsync() // Gets called upon start of app
     {
@@ -194,10 +193,12 @@
     private async Task AddTodo()
     {
         if (string.IsNullOrWhiteSpace(newTodoTitle))
+        {
             return;
+        }
 
         await TodoRepo.CreateAsync(newTodoTitle, taskPriority, newTodoDescription, newDueDate);
-    
+
         newTodoTitle = string.Empty;
         newTodoDescription = string.Empty;
         newDueDate = DateTime.Today.AddDays(1);
@@ -207,7 +208,7 @@
 
     private async Task ToggleComplete(TodoItem todo){
         todo.IsCompleted = !todo.IsCompleted;
-        
+
         if (todo.IsCompleted){
             todo.IsActive = false;
         }
@@ -217,9 +218,14 @@
 
         await LoadTodos();
     }
-
+    
     private async Task ToggleActive(TodoItem todo){
         todo.IsActive = !todo.IsActive;
+
+        if (todo.IsActive)
+        {
+            todo.IsCompleted = false;
+        }
 
         await TodoRepo.UpdateAsync(todo);
 
@@ -238,11 +244,11 @@
     }
 
     private async Task EditTask(TodoItem todo){
-            todoToEdit = todo.Id;
-            editTitle = todo.Title;
-            editDesc = todo.Description;
-            editPriority = todo.Priority;
-            editDate = todo.DueDate;
+        todoToEdit = todo.Id;
+        editTitle = todo.Title;
+        editDesc = todo.Description;
+        editPriority = todo.Priority;
+        editDate = todo.DueDate;
     }
     private async Task CancelEdit(){
         todoToEdit = null;
